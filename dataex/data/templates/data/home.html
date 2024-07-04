@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Statistics</title>
+    <link rel="stylesheet" href="{% static 'path/to/bootstrap.min.css' %}">
+    <style>
+        .chart-container {
+            display: flex;
+            justify-content: space-between;
+        }
+        .chart-container canvas {
+            flex: 1;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <!-- First Column: User Names -->
+            <!-- Second Column: Statistics -->
+            <div class="col-md-8">
+                <h2>Statistics : {{user}}</h2>
+                <div class="chart-container">
+                    <canvas id="chart1" width="700" height="500"></canvas>
+                    <canvas id="chart2" width="700" height="500"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4 column">
+                {% comment %} <h2>Users:{{user}}</h2> {% endcomment %}
+                <ul class="user-list">
+                    <!-- Assuming users is a context variable passed from the view -->
+                    {% for user in users %}
+                        <a href="{% url 'home' user.username %}">{{ user.username }}</a>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{% static 'path/to/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'data/chart.js' %}"></script>
+    <script>
+        {% comment %} const ctx = document.getElementById('chart') {% endcomment %}
+        function createChart(ctx, type) {
+            new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: {{labels|safe}}, //['python','java','php','golang'],
+                    datasets: [
+                        {
+                            data: {{data|safe}},
+                            label: '{{user}} Statistics',
+                            backgroundColor: ['red', 'blue', 'green', 'yellow', 'orange']
+                        }
+                    ],     
+                },
+                options: {
+                    responsive: false,
+                    animation: {
+                        duration: 1000,
+                        easing: 'linear',
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                color: 'black',
+                                font: {
+                                    size: 15,
+                                    family: 'Comic Sans MS'
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        const barCtx = document.getElementById('chart1').getContext('2d');
+        createChart(barCtx, 'bar');
+        const doughnutCtx = document.getElementById('chart2').getContext('2d');
+        createChart(doughnutCtx, 'polarArea');
+    </script>
+</body>
+</html>
